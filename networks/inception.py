@@ -4,23 +4,20 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
-#from torchvision.utils import load_state_dict_from_url
 from torch.hub import load_state_dict_from_url
 
-#import torchvision.models.utils as tutil
 from typing import Callable, Any, Optional, Tuple, List
 
-
 __all__ = ['Inception3', 'inception_v3', 'InceptionOutputs', '_InceptionOutputs']
-
 
 model_urls = {
     # Inception v3 ported from TensorFlow
     'inception_v3_google': 'https://download.pytorch.org/models/inception_v3_google-1a9a5a14.pth',
 }
 
-InceptionOutputs = namedtuple('InceptionOutputs', ['logits','conv', 'aux_logits'])
-InceptionOutputs.__annotations__ = {'logits': torch.Tensor, 'conv': Optional[torch.Tensor], 'aux_logits': Optional[torch.Tensor]}
+InceptionOutputs = namedtuple('InceptionOutputs', ['logits', 'conv', 'aux_logits'])
+InceptionOutputs.__annotations__ = {'logits': torch.Tensor, 'conv': Optional[torch.Tensor],
+                                    'aux_logits': Optional[torch.Tensor]}
 
 # Script annotations failed with _GoogleNetOutputs = namedtuple ...
 # _InceptionOutputs set here for backwards compat
@@ -60,12 +57,11 @@ def inception_v3(pretrained: bool = False, progress: bool = True, **kwargs: Any)
         numclass = 200
         model.AuxLogits.fc = nn.Linear(num_ftrs, numclass)
         num_ftrs = model.fc.in_features
-        model.fc = nn.Linear(num_ftrs,numclass)
+        model.fc = nn.Linear(num_ftrs, numclass)
         if not original_aux_logits:
             model.aux_logits = False
             del model.AuxLogits
         return model
-
 
     return Inception3(**kwargs)
 
@@ -73,12 +69,12 @@ def inception_v3(pretrained: bool = False, progress: bool = True, **kwargs: Any)
 class Inception3(nn.Module):
 
     def __init__(
-        self,
-        num_classes: int = 1000,
-        aux_logits: bool = True,
-        transform_input: bool = False,
-        inception_blocks: Optional[List[Callable[..., nn.Module]]] = None,
-        init_weights: Optional[bool] = None
+            self,
+            num_classes: int = 1000,
+            aux_logits: bool = True,
+            transform_input: bool = False,
+            inception_blocks: Optional[List[Callable[..., nn.Module]]] = None,
+            init_weights: Optional[bool] = None
     ) -> None:
         super(Inception3, self).__init__()
         if inception_blocks is None:
@@ -140,12 +136,12 @@ class Inception3(nn.Module):
                     nn.init.constant_(m.bias, 0)
 
     def get_params(self, param_name):
-        ftlayer_params = list(self.AuxLogits.fc.parameters()) +\
-                            list(self.fc.parameters())
+        ftlayer_params = list(self.AuxLogits.fc.parameters()) + \
+                         list(self.fc.parameters())
         ftlayer_params_ids = list(map(id, ftlayer_params))
         freshlayer_params = filter(lambda p: id(p) not in ftlayer_params_ids, self.parameters())
 
-        return eval(param_name+'_params')
+        return eval(param_name + '_params')
 
     def _transform_input(self, x: Tensor) -> Tensor:
         if self.transform_input:
@@ -208,34 +204,34 @@ class Inception3(nn.Module):
         # N x 2048
         x = self.fc(x)
         # N x 1000 (num_classes)
-        return x,conv, aux
+        return x, conv, aux
 
     @torch.jit.unused
-    def eager_outputs(self, x: Tensor,conv: Optional[Tensor], aux: Optional[Tensor]) -> InceptionOutputs:
+    def eager_outputs(self, x: Tensor, conv: Optional[Tensor], aux: Optional[Tensor]) -> InceptionOutputs:
         if self.training and self.aux_logits:
-            return InceptionOutputs(x, conv,aux)
+            return InceptionOutputs(x, conv, aux)
         else:
             return x  # type: ignore[return-value]
 
     def forward(self, x: Tensor) -> InceptionOutputs:
         x = self._transform_input(x)
-        x,conv, aux = self._forward(x)
+        x, conv, aux = self._forward(x)
         aux_defined = self.training and self.aux_logits
         if torch.jit.is_scripting():
             if not aux_defined:
                 warnings.warn("Scripted Inception3 always returns Inception3 Tuple")
             return InceptionOutputs(x, aux)
         else:
-            return self.eager_outputs(x,conv, aux)
+            return self.eager_outputs(x, conv, aux)
 
 
 class InceptionA(nn.Module):
 
     def __init__(
-        self,
-        in_channels: int,
-        pool_features: int,
-        conv_block: Optional[Callable[..., nn.Module]] = None
+            self,
+            in_channels: int,
+            pool_features: int,
+            conv_block: Optional[Callable[..., nn.Module]] = None
     ) -> None:
         super(InceptionA, self).__init__()
         if conv_block is None:
@@ -275,9 +271,9 @@ class InceptionA(nn.Module):
 class InceptionB(nn.Module):
 
     def __init__(
-        self,
-        in_channels: int,
-        conv_block: Optional[Callable[..., nn.Module]] = None
+            self,
+            in_channels: int,
+            conv_block: Optional[Callable[..., nn.Module]] = None
     ) -> None:
         super(InceptionB, self).__init__()
         if conv_block is None:
@@ -308,10 +304,10 @@ class InceptionB(nn.Module):
 class InceptionC(nn.Module):
 
     def __init__(
-        self,
-        in_channels: int,
-        channels_7x7: int,
-        conv_block: Optional[Callable[..., nn.Module]] = None
+            self,
+            in_channels: int,
+            channels_7x7: int,
+            conv_block: Optional[Callable[..., nn.Module]] = None
     ) -> None:
         super(InceptionC, self).__init__()
         if conv_block is None:
@@ -358,9 +354,9 @@ class InceptionC(nn.Module):
 class InceptionD(nn.Module):
 
     def __init__(
-        self,
-        in_channels: int,
-        conv_block: Optional[Callable[..., nn.Module]] = None
+            self,
+            in_channels: int,
+            conv_block: Optional[Callable[..., nn.Module]] = None
     ) -> None:
         super(InceptionD, self).__init__()
         if conv_block is None:
@@ -394,9 +390,9 @@ class InceptionD(nn.Module):
 class InceptionE(nn.Module):
 
     def __init__(
-        self,
-        in_channels: int,
-        conv_block: Optional[Callable[..., nn.Module]] = None
+            self,
+            in_channels: int,
+            conv_block: Optional[Callable[..., nn.Module]] = None
     ) -> None:
         super(InceptionE, self).__init__()
         if conv_block is None:
@@ -446,10 +442,10 @@ class InceptionE(nn.Module):
 class InceptionAux(nn.Module):
 
     def __init__(
-        self,
-        in_channels: int,
-        num_classes: int,
-        conv_block: Optional[Callable[..., nn.Module]] = None
+            self,
+            in_channels: int,
+            num_classes: int,
+            conv_block: Optional[Callable[..., nn.Module]] = None
     ) -> None:
         super(InceptionAux, self).__init__()
         if conv_block is None:
@@ -481,10 +477,10 @@ class InceptionAux(nn.Module):
 class BasicConv2d(nn.Module):
 
     def __init__(
-        self,
-        in_channels: int,
-        out_channels: int,
-        **kwargs: Any
+            self,
+            in_channels: int,
+            out_channels: int,
+            **kwargs: Any
     ) -> None:
         super(BasicConv2d, self).__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, bias=False, **kwargs)

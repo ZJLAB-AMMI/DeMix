@@ -1,56 +1,63 @@
-import os
-import sys
-import time
-import numpy as np
-from tqdm import tqdm
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torchvision
-import cv2
-import time
-import logging
-
 from utils import *
 
-def validate(train_loader, model, criterion, conf):
 
-    batch_time = AverageMeter()
-    data_time = AverageMeter()
+def validate(val_loader, model, criterion, conf):
     losses = AverageMeter()
+    acces = AverageAccMeter()
 
-    scores = AverageAccMeter()
-    mscores = AverageAccMeter()
-    ascores = AverageAccMeter()
-    end = time.time()
     model.eval()
 
-    time_start = time.time()
-    pbar = tqdm(train_loader, dynamic_ncols=True, total=len(train_loader))
+    with torch.no_grad():
+        for idx, (input, target) in enumerate(val_loader):
+            input = input.cuda()
+            target = target.cuda()
 
-    for idx, (input, target) in enumerate(pbar):
-        # measure data loading time
-        data_time.add(time.time() - end)
-        input = input.cuda()
-        target = target.cuda()
+            if 'inception' in conf.netname:
+                output = model(input)
+            else:
+                output, _, _ = model(input)
 
-        if 'inception' in conf.netname:
-            output = model(input)
-        else:
-            output,_,moutput = model(input)
-        scores.add(output.data, target)
-        if 'midlevel' in conf:
-            if conf.midlevel:
-                mscores.add(moutput.data, target)
-                ascores.add(output+moutput.data, target)
+            loss = torch.mean(criterion(output, target))
 
-        loss = torch.mean(criterion(output, target))
-        losses.add(loss.item(), input.size(0))
-        del loss,output
+            losses.add(loss.item(), input.size(0))
+            acces.add(output.data, target)
+            del loss, output
 
-        # measure elapsed time
-        batch_time.add(time.time() - end)
-        end = time.time()
-        pbar.set_postfix(batch_time=batch_time.value(), data_time=data_time.value(), loss=losses.value())
+    return {
+        "loss": losses.value(),
+        "accuracy": acces.value()
+    }
 
-    return scores.value(), losses.value(),mscores.value(),ascores.value()
+
+# def eval(loader, model, criterion):
+#     model.eval()
+#
+#     mean_loss = torch.zeros(1)
+#     total_corrects = torch.zeros(1)
+#     total_samples = torch.zeros(1)
+#
+#     acc = AverageAccMeter()
+#
+#     with torch.no_grad():
+#         for i, (input, target) in enumerate(loader):
+#             input = input.cuda(non_blocking=True)
+#             target = target.cuda(non_blocking=True)
+#             mean_loss = mean_loss.cuda(non_blocking=True)
+#             total_corrects = total_corrects.cuda(non_blocking=True)
+#             total_samples = total_samples.cuda(non_blocking=True)
+#
+#             output, _, moutput = model(input)
+#             loss = torch.mean(criterion(output, target))
+#             acc.add(output.data, target)
+#
+#             mean_loss = (i * mean_loss + loss.detach()) / (i + 1)
+#
+#             pred = output.data.argmax(1, keepdim=True)
+#             correct = pred.eq(target.data.view_as(pred)).sum()
+#             total_corrects += correct
+#             total_samples += torch.tensor(input.size(0))
+#
+#     return {
+#         "loss": mean_loss.item(),
+#         "accuracy": (total_corrects / total_samples).item() * 100.0
+#     }

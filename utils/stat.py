@@ -1,9 +1,3 @@
-import torch
-import pdb
-import math
-from sklearn.metrics import average_precision_score as aps
-import numpy as np
-
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 
@@ -24,6 +18,7 @@ class AverageMeter(object):
     def value(self):
         return self.sum / self.count
 
+
 class AverageAccMeter(object):
 
     def __init__(self):
@@ -35,9 +30,9 @@ class AverageAccMeter(object):
         self.sum = 0
         self.count = 0
 
-    def add(self, output,target):
+    def add(self, output, target):
         n = output.size(0)
-        self.val = self.accuracy(output,target).item()
+        self.val = self.accuracy(output, target).item()
         self.sum += self.val * n
         self.count += n
 
@@ -47,7 +42,7 @@ class AverageAccMeter(object):
         else:
             return self.sum / self.count
 
-    def accuracy(self,output, target, topk=(1,)):
+    def accuracy(self, output, target, topk=(1,)):
         """Computes the precision@k for the specified values of k"""
         maxk = max(topk)
         batch_size = target.size(0)
@@ -60,8 +55,5 @@ class AverageAccMeter(object):
         for k in topk:
             correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
             res.append(correct_k.mul_(100.0 / batch_size))
-            #wrong_k = batch_size - correct_k
-            #res.append(wrong_k.mul_(100.0 / batch_size))
 
         return res[0]
-

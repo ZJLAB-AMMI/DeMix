@@ -51,7 +51,16 @@ class ResNet(nn.Module):
         else:
             mlogits = None
 
-        return logits, x.detach(), mlogits
+        # return logits, x.detach(), mlogits
+        return logits, x.detach()
+
+    def _init_weight(self, block):
+        for m in block.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
 
     def get_params(self, param_name):
         ftlayer_params = list(self.conv3.parameters()) + \

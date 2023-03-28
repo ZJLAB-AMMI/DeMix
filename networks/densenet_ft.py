@@ -1,42 +1,29 @@
-import os
-import sys
-import numpy as np
-from math import floor
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import copy
-import cv2
-
-import torchvision
 from torchvision import models
-import pdb
 
-dimdict = {'densenet121':1024,'densenet201':1920}
+dimdict = {'densenet121': 1024, 'densenet201': 1920}
+
 
 class DenseNet(nn.Module):
 
-    def __init__(self,conf):
+    def __init__(self, conf):
         super(DenseNet, self).__init__()
-        basenet = eval('models.'+conf.netname)(pretrained=conf.pretrained)
+        basenet = eval('models.' + conf.netname)(pretrained=conf.pretrained)
         self.feature = nn.Sequential(*list(basenet.children())[:-1])
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
         indim = dimdict[conf.netname]
         self.classifier = nn.Linear(indim, conf.num_class)
 
-    def set_detach(self,isdetach):
+    def set_detach(self, isdetach):
         pass
-
 
     def forward(self, x):
         x = self.feature(x)
         x = F.relu(x, inplace=True)
         fea_pool = self.avg_pool(x).view(x.size(0), -1)
         logits = self.classifier(fea_pool)
-        return logits,x.detach(),None
-
-        #results = {'logit': [logits]}
-        #return results
+        return logits, x.detach(), None
 
     def _init_weight(self, block):
         for m in block.modules():
@@ -51,7 +38,7 @@ class DenseNet(nn.Module):
         ftlayer_params_ids = list(map(id, ftlayer_params))
         freshlayer_params = filter(lambda p: id(p) not in ftlayer_params_ids, self.parameters())
 
-        return eval(param_name+'_params')
+        return eval(param_name + '_params')
 
 
 def get_net(conf):

@@ -1,11 +1,10 @@
-
 import logging
-import utils
-from utils.conf import print_conf
 import os
 
+from utils.conf import print_conf
 
-def set_logger(cfg):
+
+def set_logger(cfg, file_name=None):
     """Set the logger to log info in terminal and file `log_path`.
 
     In general, it is useful to have a logger so that every output to the terminal is saved
@@ -21,19 +20,25 @@ def set_logger(cfg):
     """
 
     if 'loglevel' in cfg:
-        loglevel = eval('logging.'+loglevel)
+        loglevel = eval('logging.' + cfg['loglevel'])
     else:
         loglevel = logging.INFO
 
-
-    if cfg.evaluate:
-        outname = 'test.log'
+    if 'debug' in cfg and cfg['debug']:
+        outname = 'debug.log'
     else:
-        outname = 'train.log'
+        outname = '{}_{}'.format(cfg.dataset, cfg.netname)
+        if file_name is not None:
+            outname += '_' + file_name
 
-    outdir = cfg['outdir']
-    log_path = os.path.join(outdir,outname)
+        if cfg.evaluate:
+            outname += '_test.log'
+        else:
+            outname += '_train.log'
 
+    outdir = cfg['result_root']
+
+    log_path = os.path.join(outdir, outname)
 
     logger = logging.getLogger()
     logger.setLevel(loglevel)
@@ -51,5 +56,3 @@ def set_logger(cfg):
 
     logging.info(print_conf(cfg))
     logging.info('writting logs to file {}'.format(log_path))
-
-

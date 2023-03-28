@@ -10,7 +10,8 @@ tmp
 *.jpg
 *.png
 utils/glasbey
-
+.idea
+.git
 
 
 *.checkpoint

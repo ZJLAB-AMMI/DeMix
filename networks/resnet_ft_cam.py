@@ -51,7 +51,7 @@ class ResNet(nn.Module):
         else:
             mlogits = None
 
-        return logits, x.detach(), mlogits
+        return logits
 
     def get_params(self, param_name):
         ftlayer_params = list(self.conv3.parameters()) + \
