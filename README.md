@@ -1,6 +1,5 @@
-# SnapMix: Semantically Proportional Mixing for Augmenting Fine-grained Data (AAAI 2021)
-
-PyTorch implementation of SnapMix | [paper](https://arxiv.org/abs/2012.04846)
+# Detection Transformer can be Used as a Data Augmenter
+PyTorch implementation of DeMix | [paper](https:xxx)
 
 ## Method Overview
 
