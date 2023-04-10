@@ -76,11 +76,7 @@ def add_saliency_res(dataset, conf):
 
 
 def get_dataloader(conf):
-    if conf.dataset in {'cifar10', 'cifar100'}:
-        file_name = 'cifar.py'
-    elif conf.dataset in {'tiny_imagenet'}:
-        file_name = 'imagenet.py'
-    elif conf.dataset in {'cub'}:
+    if conf.dataset in {'cub'}:
         file_name = 'cub.py'
     elif conf.dataset in {'car'}:
         file_name = 'car.py'
