@@ -4,7 +4,7 @@ PyTorch implementation of SnapMix | [paper](https://arxiv.org/abs/2012.04846)
 
 ## Method Overview
 
-![SnapMix](./imgs/overview.jpg)
+![DeMix](./imgs/overview.jpg)
 
 ## Cite
 ```
