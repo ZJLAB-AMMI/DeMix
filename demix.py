@@ -52,85 +52,81 @@ def main(conf, method_str):
         detach_epoch = conf.detach_epoch
 
     criterion = get_criterion(conf)
-    if conf.is_train:
-        optimizer, scheduler = get_train_setting(model, conf)
-        if checkpoint_dict is not None:
-            epoch_start = checkpoint_dict['epoch']
-            print('Resuming training process from epoch {}...'.format(epoch_start))
-            optimizer.load_state_dict(checkpoint_dict['optimizer'])
-            scheduler.load_state_dict(checkpoint_dict['scheduler'])
-        for epoch in range(epoch_start, conf.epochs):
-            time_ep = time.time()
-            lr = optimizer.param_groups[0]['lr']
+    optimizer, scheduler = get_train_setting(model, conf)
+    if checkpoint_dict is not None:
+        epoch_start = checkpoint_dict['epoch']
+        print('Resuming training process from epoch {}...'.format(epoch_start))
+        optimizer.load_state_dict(checkpoint_dict['optimizer'])
+        scheduler.load_state_dict(checkpoint_dict['scheduler'])
+    for epoch in range(epoch_start, conf.epochs):
+        time_ep = time.time()
+        lr = optimizer.param_groups[0]['lr']
 
-            if epoch == detach_epoch:
-                model.module.set_detach(False)
+        if epoch == detach_epoch:
+            model.module.set_detach(False)
 
-            train_res = train(epoch / conf.epochs, train_loader, model, criterion, optimizer, conf, wmodel)
-            scheduler.step()
-            test_res = {"loss": None, "accuracy": None}
-            if epoch % conf.eval_freq == conf.eval_freq - 1 or epoch == conf.epochs - 1:
-                with torch.no_grad():
-                    test_res = validate(val_loader, model, criterion, conf)
-                    cur_acc = test_res["accuracy"]
-                    is_best = cur_acc > best_acc
-                    best_acc = max(cur_acc, best_acc)
-                    if conf.save_model and is_best:
-                        save_checkpoint(
-                            output_path,
-                            epoch + 1,
-                            is_best=True,
-                            state_dict=model.state_dict(),
-                            optimizer=optimizer.state_dict(),
-                            scheduler=scheduler.state_dict(),
-                            best_acc=best_acc
-                        )
-            time_ep = time.time() - time_ep
-            columns = ["mixmethod", "epoch", "learning_rate", "train_loss", "test_loss",
-                       "test_acc",
-                       "cost_time"]
-            values = [conf.mixmethod, epoch + 1, lr, train_res["loss"],
-                      test_res["loss"],
-                      test_res["accuracy"],
-                      time_ep]
-            table = tabulate.tabulate([values], columns, tablefmt="simple", floatfmt="8.4f")
-            if epoch % 50 == 0:
-                table = table.split("\n")
-                table = "\n".join([table[1]] + table)
-            else:
-                table = table.split("\n")[2]
-            if epoch % conf.eval_freq == conf.eval_freq - 1 or epoch == conf.epochs - 1:
-                logging.info(table)
-            else:
-                print(table)
-    else:
-        with torch.no_grad():
-            test_res = validate(val_loader, model, criterion, conf)
-            print(test_res)
+        train_res = train(epoch / conf.epochs, train_loader, model, criterion, optimizer, conf, wmodel)
+        scheduler.step()
+        test_res = {"loss": None, "accuracy": None}
+        if epoch % conf.eval_freq == conf.eval_freq - 1 or epoch == conf.epochs - 1:
+            with torch.no_grad():
+                test_res = validate(val_loader, model, criterion, conf)
+                cur_acc = test_res["accuracy"]
+                is_best = cur_acc > best_acc
+                best_acc = max(cur_acc, best_acc)
+                if conf.save_model and is_best:
+                    save_checkpoint(
+                        output_path,
+                        epoch + 1,
+                        is_best=True,
+                        state_dict=model.state_dict(),
+                        optimizer=optimizer.state_dict(),
+                        scheduler=scheduler.state_dict(),
+                        best_acc=best_acc
+                    )
+        time_ep = time.time() - time_ep
+        columns = ["mixmethod", "epoch", "learning_rate", "train_loss", "test_loss",
+                   "test_acc",
+                   "cost_time"]
+        values = [conf.mixmethod, epoch + 1, lr, train_res["loss"],
+                  test_res["loss"],
+                  test_res["accuracy"],
+                  time_ep]
+        table = tabulate.tabulate([values], columns, tablefmt="simple", floatfmt="8.4f")
+        if epoch % 50 == 0:
+            table = table.split("\n")
+            table = "\n".join([table[1]] + table)
+        else:
+            table = table.split("\n")[2]
+        if epoch % conf.eval_freq == conf.eval_freq - 1 or epoch == conf.epochs - 1:
+            logging.info(table)
+        else:
+            print(table)
 
     return 0
 
 
 if __name__ == '__main__':
-    gpu_ids = '6,7'
-    netname_set = ['resnet18', 'resnet50']
-    dataset_set = ['cub', 'car', 'aircraft']
-    mixmethod_set = ['detrmix']
-    pretrained = 0
-    for netname in netname_set:
-        for dataset in dataset_set:
-            for mixmethod in mixmethod_set:
-                conf = get_config(dataset=dataset, netname=netname, mixmethod=mixmethod, gpu_ids=gpu_ids, pretrained=pretrained)
-                conf.batch_size = 16
-                conf.workers = 16
-                conf.weight_decay = 1e-4
-                conf.prob = 0.5
-                set_env(conf)
-                # generate outdir name
-                set_outdir(conf)
-                # Set the logger
-                method_str = conf.mixmethod
-                method_str += '_bs{}_wd{}_pretrained0'.format(conf.batch_size, conf.weight_decay)
-                method_str += '_{}'.format(conf.seed)
-                set_logger(conf, file_name=method_str)
-                main(conf, method_str)
+    # config
+    gpu_ids = '0'
+    netname = 'resnet18'
+    dataset = 'cub'
+    mixmethod = 'detrmix'
+    pretrained = 1
+
+    conf = get_config(dataset=dataset, netname=netname, mixmethod=mixmethod, gpu_ids=gpu_ids, pretrained=pretrained)
+
+    method_str = conf.mixmethod
+    method_str += '_pretrained{}_seed{}'.format(conf.pretrained, conf.seed)
+
+    # set env
+    set_env(conf)
+
+    # generate outdir name
+    set_outdir(conf)
+
+    # Set the logger
+    set_logger(conf, file_name=method_str)
+
+    # main
+    main(conf, method_str)

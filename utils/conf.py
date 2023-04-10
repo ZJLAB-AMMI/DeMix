@@ -92,6 +92,7 @@ def get_config(dataset=None, netname=None, mixmethod=None, gpu_ids=None, pretrai
     if not cfg.pretrained:
         cfg['lr_group'] = [0.01, 0.01]
         cfg['epochs'] = 300
+        cfg['prob'] = 0.5
 
     if cfg['epochs'] == 300:
         cfg['lrstep'] = [150, 225, 270]
@@ -135,7 +136,7 @@ parser.add_argument('--config', default='config/comm.yml', type=str, help='confi
 
 # train
 parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='momentum')
-parser.add_argument('--weight_decay', '--wd', default=5e-4, type=float, metavar='W',
+parser.add_argument('--weight_decay', '--wd', default=1e-4, type=float, metavar='W',
                     help='weight decay (default: 1e-4)')
 parser.add_argument('--resume', default='', type=str, metavar='path', help='path to latest checkpoint (default: none)')
 parser.add_argument('--epochs', default=200, type=int, metavar='N', help='number of total epochs to run')

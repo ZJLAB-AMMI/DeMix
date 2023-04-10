@@ -24,17 +24,15 @@ def set_logger(cfg, file_name=None):
     else:
         loglevel = logging.INFO
 
-    if 'debug' in cfg and cfg['debug']:
-        outname = 'debug.log'
-    else:
-        outname = '{}_{}'.format(cfg.dataset, cfg.netname)
-        if file_name is not None:
-            outname += '_' + file_name
+    outname = '{}_{}'.format(cfg.dataset, cfg.netname)
 
-        if cfg.evaluate:
-            outname += '_test.log'
-        else:
-            outname += '_train.log'
+    if file_name is not None:
+        outname += '_' + file_name
+
+    if cfg.evaluate:
+        outname += '_test.log'
+    else:
+        outname += '_train.log'
 
     outdir = cfg['result_root']
 

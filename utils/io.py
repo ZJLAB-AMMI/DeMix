@@ -57,37 +57,35 @@ def load_checkpoint(dir, epoch, name="checkpoint", is_best=False, **kwargs):
 
 
 def set_outdir(conf):
-    if 'debug' in conf and conf['debug']:
-        outdir = os.path.join(conf.result_root, 'debug')
+    if 'timedir' in conf:
+        timestr = datetime.now().strftime('%d-%m-%Y_%I_%M-%S_%p')
+        outdir = os.path.join(conf.result_root, conf.mixmethod, conf.net_type + '_' + conf.dataset, timestr)
     else:
-        if 'timedir' in conf:
-            timestr = datetime.now().strftime('%d-%m-%Y_%I_%M-%S_%p')
-            outdir = os.path.join(conf.result_root, conf.mixmethod, conf.net_type + '_' + conf.dataset, timestr)
-        else:
-            outdir = os.path.join(conf.result_root, conf.mixmethod, conf.netname + '_' + conf.dataset)
+        outdir = os.path.join(conf.result_root, conf.mixmethod, conf.netname + '_' + conf.dataset)
 
-            prefix = 'bs_' + str(conf.batch_size) + 'seed_' + str(conf.seed)
+        prefix = 'bs_' + str(conf.batch_size) + 'seed_' + str(conf.seed)
 
-            if conf.weightfile:
-                prefix = 'ft_' + prefix
+        if conf.weightfile:
+            prefix = 'ft_' + prefix
 
-            if not conf.pretrained:
-                prefix = 'scratch_' + prefix
+        if not conf.pretrained:
+            prefix = 'scratch_' + prefix
 
-            if 'midlevel' in conf:
-                if conf.midlevel:
-                    prefix += 'mid_'
-            if 'mixmethod' in conf:
-                if isinstance(conf.mixmethod, list):
-                    prefix += '_'.join(conf.mixmethod)
-                else:
-                    prefix += conf.mixmethod + '_'
-            if 'prob' in conf:
-                prefix += '_p' + str(conf.prob)
-            if 'beta' in conf:
-                prefix += '_b' + str(conf.beta)
+        if 'midlevel' in conf:
+            if conf.midlevel:
+                prefix += 'mid_'
 
-            outdir = os.path.join(outdir, prefix)
+        if 'mixmethod' in conf:
+            if isinstance(conf.mixmethod, list):
+                prefix += '_'.join(conf.mixmethod)
+            else:
+                prefix += conf.mixmethod + '_'
+        if 'prob' in conf:
+            prefix += '_p' + str(conf.prob)
+        if 'beta' in conf:
+            prefix += '_b' + str(conf.beta)
+
+        outdir = os.path.join(outdir, prefix)
 
     ensure_dir(outdir)
     conf['outdir'] = outdir
