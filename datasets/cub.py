@@ -1,10 +1,12 @@
-from PIL import Image
 import os
-import pandas as pd
+
 import numpy as np
-from datasets.tfs import get_cub_transform
-from torch.utils.data import Dataset
+import pandas as pd
+from PIL import Image
 from easydict import EasyDict
+from torch.utils.data import Dataset
+
+from datasets.tfs import get_cub_transform
 from utils.mixmethod import get_object, get_saliency_patch, detrmix, saliencymix
 
 
