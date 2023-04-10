@@ -1,14 +1,15 @@
-import torch
-import numpy as np
-from PIL import Image
 import os
+
+import numpy as np
 import pandas as pd
-from torch.utils.data.sampler import WeightedRandomSampler
-from scipy.io import loadmat
-from datasets.tfs import get_car_transform
+import torch
+from PIL import Image
 from easydict import EasyDict
-from utils.mixmethod import get_object, get_saliency_patch, get_part_object, get_detr_target_label_weight, detrmix, \
-    saliencymix_v2
+from scipy.io import loadmat
+from torch.utils.data.sampler import WeightedRandomSampler
+
+from datasets.tfs import get_car_transform
+from utils.mixmethod import get_object, get_saliency_patch, detrmix, saliencymix
 
 
 def pil_loader(path):
@@ -61,7 +62,7 @@ class ImageLoader(torch.utils.data.Dataset):
 
         res = target
 
-        if self.train and self.conf.mixmethod in {'detrmix', 'pdetrmix', 'sum1pdetrmix', 'campdetrmix'}:
+        if self.train and self.conf.mixmethod in {'detrmix'}:
             source_idx = np.random.randint(len(self.imgs))
             source_item = self.imgs.iloc[source_idx]
             source_detr_res = source_item['detr_res']
@@ -77,31 +78,8 @@ class ImageLoader(torch.utils.data.Dataset):
                 bbx1, bby1, bbx2, bby2 = bbox
                 lam_b = (bbx2 - bbx1) * (bby2 - bby1) / img.shape[0] / img.shape[1]
                 lam_a = 1.0 - lam_b
-
-                if self.conf.mixmethod in {'pdetrmix', 'sum1pdetrmix'}:
-                    target_valid_area_wt, target_background_area_wt, target_valid_box_p = get_detr_target_label_weight(
-                        img.shape, target_detr_res, bbox)
-                    lam_a = target_valid_area_wt * target_valid_box_p + target_background_area_wt * self.conf.background_wt
-                    lam_b = (1.0 - target_valid_area_wt) * source_detr_res[4][0]
-
-                    if self.conf.mixmethod == 'sum1pdetrmix':
-                        lam_a = lam_a / (lam_a + lam_b + 1e-8)
-                        lam_b = 1.0 - lam_a
-
                 target_b = source_item['label']
 
-                if np.random.rand(1) < 0.0005:
-                    img_save_root = '/home/WLP/pythonProject/uncertainty/SnapMix/data'
-                    import matplotlib.pyplot as plt
-                    fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(6, 6), sharex=False, sharey=False)
-                    axes.imshow(img)
-                    text = f'wa: {lam_a:0.2f}, wb: {lam_b:0.2f}'
-                    axes.text(0, 0, text, fontsize=15, bbox=dict(facecolor='yellow', alpha=0.5))
-                    plt.axis('off')
-                    plt.show()
-                    fig.savefig(os.path.join(img_save_root,
-                                             '{}_{}_img_{}.png'.format(self.conf.mixmethod, self.conf.dataset,
-                                                                       index % 10)), bbox_inches='tight')
             else:
                 lam_a = 1.0
                 lam_b = 0.0
@@ -116,24 +94,10 @@ class ImageLoader(torch.utils.data.Dataset):
             r = np.random.rand(1)
             if r < self.conf.prob and len(source_saliency_res) > 0:
                 source_img = self.loader(os.path.join(self.root, source_item['path']))
-
                 patch = get_saliency_patch(np.array(source_img), source_saliency_res)
-
-                img, lam_b = saliencymix_v2(np.array(img), patch, source_saliency_res)
+                img, lam_b = saliencymix(np.array(img), patch, source_saliency_res)
                 lam_a = 1.0 - lam_b
-
                 target_b = source_item['label']
-
-                if np.random.rand(1) < 0.0005:
-                    img_save_root = '/home/WLP/pythonProject/uncertainty/SnapMix/data'
-                    import matplotlib.pyplot as plt
-                    fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(6, 6), sharex=False, sharey=False)
-                    axes.imshow(img)
-                    text = f'wa: {lam_a:0.2f}, wb: {lam_b:0.2f}'
-                    axes.text(0, 0, text, fontsize=15, bbox=dict(facecolor='yellow', alpha=0.5))
-                    plt.axis('off')
-                    plt.show()
-                    fig.savefig(os.path.join(img_save_root, '{}_{}_img_{}.png'.format(self.conf.mixmethod, self.conf.dataset, index % 10)), bbox_inches='tight')
             else:
                 lam_a = 1.0
                 lam_b = 0.0
