@@ -11,24 +11,20 @@ from easydict import EasyDict as edict
 parser = argparse.ArgumentParser(description='PyTorch Training')
 
 
-def str2bool(v):
-    return v.lower() in ('true', '1')
+def print_conf(opt):
+    """Print and save options
+    It will print both current options and default values(if different).
+    It will save options into a text file / [checkpoints_dir] / opt.txt
+    """
+    message = ''
+    message += '----------------- Options ---------------\n'
+    for k, v in sorted(vars(opt).items()):
+        comment = ''
+        message += '{:>25}: {:<30}{}\n'.format(str(k), str(v), comment)
+    message += '----------------- End -------------------'
+    return message
 
 
-def add_argument_group(name):
-    arg = parser.add_argument_group(name)
-    arg_lists.append(arg)
-    return arg
-
-
-# ------------------------------
-def parser2dict():
-    config, unparsed = parser.parse_known_args()
-    cfg = edict(config.__dict__)
-    return edict(cfg)
-
-
-# ------------------------------
 def _merge_a_into_b(a, b):
     """Merge config dictionary a into config dictionary b, clobbering the
     options in b whenever they are also specified in a.
@@ -53,21 +49,10 @@ def _merge_a_into_b(a, b):
             b[k] = v
 
 
-def print_conf(opt):
-    """Print and save options
-    It will print both current options and default values(if different).
-    It will save options into a text file / [checkpoints_dir] / opt.txt
-    """
-    message = ''
-    message += '----------------- Options ---------------\n'
-    for k, v in sorted(vars(opt).items()):
-        comment = ''
-        # default = self.parser.get_default(k)
-        # if v != default:
-        #     comment = '\t[default: %s]' % str(default)
-        message += '{:>25}: {:<30}{}\n'.format(str(k), str(v), comment)
-    message += '----------------- End -------------------'
-    return message
+def parser2dict():
+    config, unparsed = parser.parse_known_args()
+    cfg = edict(config.__dict__)
+    return edict(cfg)
 
 
 def cfg_from_file(cfg):
@@ -84,10 +69,10 @@ def cfg_from_file(cfg):
     return cfg
 
 
-def get_config(dataset=None, netname=None, mixmethod=None, gpu_ids=None, debug=False, area_wt=0.0, background_wt=0.0, pretrained=1):
-    # args from argparser
+def get_config(dataset=None, netname=None, mixmethod=None, gpu_ids=None, pretrained=1):
     cfg = parser2dict()
     cfg = cfg_from_file(cfg)
+
     if dataset is not None:
         cfg.dataset = dataset
     if netname is not None:
@@ -96,26 +81,13 @@ def get_config(dataset=None, netname=None, mixmethod=None, gpu_ids=None, debug=F
         cfg.mixmethod = mixmethod
     if gpu_ids is not None:
         cfg.gpu_ids = gpu_ids
-    if area_wt > 0:
-        cfg.area_wt = area_wt
-    if background_wt > 0:
-        cfg.background_wt = background_wt
+
     cfg.pretrained = pretrained
 
-    if 'mixmethod' in cfg:
-        cfg['mixmethod'] = cfg['mixmethod'].split(',')
-        if len(cfg['mixmethod']) == 1:
-            cfg['mixmethod'] = cfg['mixmethod'][0]
-
-    if cfg.dataset in {'cub', 'car', 'aircraft'}:
-        cfg['prams_group'] = ['ftlayer', 'freshlayer']
-        cfg['lr_group'] = [0.001, 0.01]
-        cfg['lrstep'] = [80, 150, 180]
-        cfg['lrgamma'] = 0.1
-        cfg['lr'] = 0.01
-        cfg['batch_size'] = 16
-        cfg['workers'] = 16
-        cfg['cropsize'] = 448
+    cfg['lr'] = 0.01
+    cfg['batch_size'] = 16
+    cfg['workers'] = 16
+    cfg['cropsize'] = 448
 
     if not cfg.pretrained:
         cfg['lr_group'] = [0.01, 0.01]
@@ -127,17 +99,8 @@ def get_config(dataset=None, netname=None, mixmethod=None, gpu_ids=None, debug=F
     if cfg['epochs'] == 100:
         cfg['lrstep'] = [40, 70]
 
-    if cfg.dataset in ['nabirds', 'cub']:
+    if cfg.dataset in ['cub']:
         cfg['warp'] = False
-
-    if debug:
-        cfg['debug'] = True
-        cfg['save_model'] = False
-        cfg['epochs'] = 1
-        cfg['batch_size'] = 16
-        cfg['eval_freq'] = 1
-    else:
-        cfg['debug'] = False
 
     return cfg
 
@@ -184,7 +147,7 @@ parser.add_argument('--pretrained', default=1, type=float, help='loss weights')
 # others
 
 parser.add_argument('--mixmethod', default='snapmix', type=str, help='config files')
-parser.add_argument('--netname', default='WideResNet28x10', type=str, help='config files')
+parser.add_argument('--netname', default='resnet50', type=str, help='config files')
 parser.add_argument('--dropout_rate', type=float, default=0.3, help='')
 parser.add_argument('--prob', type=float, default=1.0, help='')
 parser.add_argument('--area_wt', type=float, default=0.0, help='')

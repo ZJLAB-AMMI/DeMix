@@ -112,45 +112,6 @@ def main(conf, method_str):
 
 
 if __name__ == '__main__':
-    # get configs and set envs
-    # dataset = 'cub'
-    # netname = 'resnet50'
-    # mixmethod = 'pdetrmix'
-    debug = False
-    # conf.is_train = False
-    # conf.save_model = False
-    # conf.batch_size = 32
-    # conf.resume = True
-    # conf.eval_freq = 1
-
-    """
-    screen -r first_run
-        data_augmentation_set = [False, True]
-        dataset_set = ['cifar100', 'cifar10']
-        mixmethod_set = ['baseline', 'mixup', 'cutmix']
-    screen -r imagenet 
-        conf.netname = 'resnet50'
-        conf.epochs = 300
-        conf.lrgamma = 0.1
-        conf.lrstep = [75, 150, 225]
-        conf.weight_decay = 1e-4
-        data_augmentation_set = [False]
-        dataset_set = ['tiny_imagenet']
-        mixmethod_set = ['baseline', 'mixup', 'cutmix', 'saliencymix']
-    screen -r resnet101
-        dataset_set = ['cub']
-        mixmethod_set = ['cutmix', 'mixup', 'baseline']
-        netname = 'resnet101'
-    screen -r snapmix
-        dataset_set = ['cub']
-        mixmethod_set = ['snapmix', 'pdetrmix', 'detrmix', 'sum1pdetrmix', 'saliencymix', 'cutmix', 'mixup', 'baseline']
-        netname = 'resnet50'
-    """
-    # conf.netname = 'resnet50'
-    # conf.epochs = 300
-    # conf.lrgamma = 0.1
-    # conf.lrstep = [75, 150, 225]
-    # conf.weight_decay = 1e-4
     gpu_ids = '6,7'
     netname_set = ['resnet18', 'resnet50']
     dataset_set = ['cub', 'car', 'aircraft']
