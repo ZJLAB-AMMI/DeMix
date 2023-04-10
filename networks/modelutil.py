@@ -9,10 +9,6 @@ def get_model(conf):
         net_type = 'densenet_ft'
     elif 'inception' in conf.netname:
         net_type = 'inception_ft'
-    elif 'efficient' in conf.netname:
-        net_type = 'efficientnet_ft'
-    elif 'WideResNet28x10' in conf.netname:
-        net_type = 'wide_resnet'
     else:
         print('{} type not support'.format(conf.netname))
 
