@@ -16,13 +16,13 @@ pip install -r requirements.txt
 
 ### Datasets
 
-***download required fine-grained datasets: CUB-200-2011, Stanford-Cars, FGVC-Aircraft***
+***download the fine-grained datasets: CUB-200-2011, Stanford-Cars, FGVC-Aircraft***
 
 ### DETR detection
 
-```
-python datasets/dataset_process.py
-```
+1, import the function:```from datasets.dataset_process import compute_detr_res```
+
+2, run the function: ```compute_detr_res(dataset_name='cub')  # ['cub', 'car', 'aircraft']```
 
 ## Training
 ```
