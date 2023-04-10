@@ -65,8 +65,9 @@ def main(conf, method_str):
         if epoch == detach_epoch:
             model.module.set_detach(False)
 
-        train_res = train(epoch / conf.epochs, train_loader, model, criterion, optimizer, conf, wmodel)
+        train_res = train(train_loader, model, criterion, optimizer, conf, wmodel)
         scheduler.step()
+
         test_res = {"loss": None, "accuracy": None}
         if epoch % conf.eval_freq == conf.eval_freq - 1 or epoch == conf.epochs - 1:
             with torch.no_grad():
@@ -84,6 +85,7 @@ def main(conf, method_str):
                         scheduler=scheduler.state_dict(),
                         best_acc=best_acc
                     )
+
         time_ep = time.time() - time_ep
         columns = ["mixmethod", "epoch", "learning_rate", "train_loss", "test_loss",
                    "test_acc",
