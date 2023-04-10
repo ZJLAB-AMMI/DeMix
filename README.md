@@ -16,9 +16,19 @@ pip install -r requirements.txt
 
 ### Datasets
 
-***download the fine-grained datasets: CUB-200-2011, Stanford-Cars, FGVC-Aircraft***
+***download the fine-grained datasets:***
 
-### DETR detection
+[CUB-200-2011](https://data.caltech.edu/records/65de6-vp158/files/CUB_200_2011.tgz?download=1)
+
+Stanford-Cars
+[devkit](https://ai.stanford.edu/~jkrause/cars/car_devkit.tgz),
+[train](https://ai.stanford.edu/~jkrause/car196/cars_train.tgz),
+[test](https://ai.stanford.edu/~jkrause/car196/cars_test.tgz),
+[test_annos_withlabels](https://ai.stanford.edu/~jkrause/car196/cars_test_annos_withlabels.mat)
+
+[FGVC-Aircraft](https://www.robots.ox.ac.uk/~vgg/data/fgvc-aircraft/archives/fgvc-aircraft-2013b.tar.gz)
+
+### DETR object detection
 
 1, import the function:```from datasets.dataset_process import compute_detr_res```
 
