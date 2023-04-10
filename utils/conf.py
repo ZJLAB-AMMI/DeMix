@@ -147,7 +147,7 @@ parser.add_argument('--pretrained', default=1, type=float, help='loss weights')
 
 # others
 
-parser.add_argument('--mixmethod', default='snapmix', type=str, help='config files')
+parser.add_argument('--mixmethod', default='mixup', type=str, help='config files')
 parser.add_argument('--netname', default='resnet50', type=str, help='config files')
 parser.add_argument('--dropout_rate', type=float, default=0.3, help='')
 parser.add_argument('--prob', type=float, default=1.0, help='')
