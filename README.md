@@ -1,6 +1,6 @@
 # Detection Transformer can be Used as a Data Augmenter
 
-PyTorch implementation of DeMix | [paper](https:xxx)
+PyTorch implementation of DeMix | [paper](https://arxiv.org/pdf/2304.04554.pdf)
 
 ## Method Overview
 
@@ -32,7 +32,7 @@ Stanford-Cars
 
 1, import the function:```from datasets.dataset_process import compute_detr_res```
 
-2, run the function: ```compute_detr_res(dataset_name='cub')  # ['cub', 'car', 'aircraft']```
+2, run the function: ```compute_detr_res(dataset_name='cub', datadir='cub data dir')  # ['cub', 'car', 'aircraft']```
 
 ## Training
 ```

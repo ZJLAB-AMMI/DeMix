@@ -7,11 +7,11 @@ from torch.utils import data
 
 def add_detr_res(dataset, conf):
     if conf.dataset in {'cub'}:
-        datadir = '/AMMI_DATA_01/dataset/cub-200-2011/CUB_200_2011'
+        datadir = conf.cub_datadir
     elif conf.dataset in {'car'}:
-        datadir = '/AMMI_DATA_01/dataset/stanford_cars'
+        datadir = conf.car_datadir
     elif conf.dataset in {'aircraft'}:
-        datadir = '/AMMI_DATA_01/dataset/fgvc-aircraft-2013b'
+        datadir = conf.aircraft_datadir
 
     path = os.path.join(datadir, '{}_detr_detection_result_800.pkl'.format(conf.dataset))
 
@@ -30,11 +30,11 @@ def add_detr_res(dataset, conf):
 
 def add_saliency_res(dataset, conf):
     if conf.dataset in {'cub'}:
-        datadir = '/AMMI_DATA_01/dataset/cub-200-2011/CUB_200_2011'
+        datadir = conf.cub_datadir
     elif conf.dataset in {'car'}:
-        datadir = '/AMMI_DATA_01/dataset/stanford_cars'
+        datadir = conf.car_datadir
     elif conf.dataset in {'aircraft'}:
-        datadir = '/AMMI_DATA_01/dataset/fgvc-aircraft-2013b'
+        datadir = conf.aircraft_datadir
 
     path = os.path.join(datadir, '{}_saliency_result_224.pkl'.format(conf.dataset))
 

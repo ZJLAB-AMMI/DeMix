@@ -60,11 +60,6 @@ def get_params(model, conf=None):
 
 
 def get_train_setting(model, conf):
-    if conf.dataset in {'cifar10', 'cifar100'}:
-        optim = torch.optim.SGD(model.parameters(), lr=conf.lr, momentum=conf.momentum, weight_decay=conf.weight_decay)
-    else:
-        optim = get_sgd(get_params(model, conf), conf)
-
+    optim = get_sgd(get_params(model, conf), conf)
     lrscheduler = get_multisteplr(optim, conf)
-
     return optim, lrscheduler

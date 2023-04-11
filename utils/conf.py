@@ -128,7 +128,7 @@ def set_env(cfg):
 parser.add_argument('-j', '--workers', default=16, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('-b', '--batch_size', default=16, type=int, metavar='N', help='mini-batch size (default: 64)')
-parser.add_argument('--gpu_ids', type=str, default='1', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
 parser.add_argument('--weightfile', default=None, type=str, metavar='PATH', help='path to model (default: none)')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true', help='evaluate model on validation set')
 parser.add_argument('--seed', default=0, type=int, help='seeding for all random operation')
@@ -147,31 +147,33 @@ parser.add_argument('--pretrained', default=1, type=float, help='loss weights')
 
 # others
 
-parser.add_argument('--mixmethod', default='mixup', type=str, help='config files')
-parser.add_argument('--netname', default='resnet50', type=str, help='config files')
+parser.add_argument('--mixmethod', default='detrmix', type=str, help='config files')
+parser.add_argument('--netname', default='resnet18', type=str, help='config files')
 parser.add_argument('--dropout_rate', type=float, default=0.3, help='')
 parser.add_argument('--prob', type=float, default=1.0, help='')
-parser.add_argument('--area_wt', type=float, default=0.0, help='')
-parser.add_argument('--background_wt', type=float, default=0.0, help='')
 parser.add_argument('--beta', type=float, default=1.0, help='')
-parser.add_argument('--sample_rate', type=float, default=1.0, help='')
-parser.add_argument('--cf_min', type=float, default=0.7, help='')
 parser.add_argument('--dataset', default='cifar100', type=str, help='dataset')
 parser.add_argument('--cropsize', default=448, type=int, metavar='N', help='cropsize')
 parser.add_argument('--midlevel', dest='midlevel', action='store_true', help='midlevel')
 parser.add_argument('--train_proc', default='comm', type=str, help='dataset')
 parser.add_argument('--start_eval', default=-1, type=int, metavar='N', help='network depth')
 
-parser.add_argument('--data_augmentation', dest='data_augmentation', action='store_true',
-                    help='evaluate model on validation set')
-parser.add_argument("--output_root", type=str, default="/AMMI_DATA_01/WLP/test/model", required=False,
+
+parser.add_argument("--cub_datadir", type=str, default="/dataset/cub-200-2011/CUB_200_2011", required=False,
                     help=" ")
 
-parser.add_argument("--result_root", type=str, default="/AMMI_DATA_01/WLP/test/result", required=False,
+parser.add_argument("--car_datadir", type=str, default="/dataset/stanford_cars", required=False,
                     help=" ")
 
-parser.add_argument('--single_box', dest='single_box', action='store_true', default=False,
-                    help='evaluate model on validation set')
+parser.add_argument("--aircraft_datadir", type=str, default="/dataset/fgvc-aircraft-2013b", required=False,
+                    help=" ")
+
+
+parser.add_argument("--output_root", type=str, default="/model", required=False,
+                    help=" ")
+
+parser.add_argument("--result_root", type=str, default="/result", required=False,
+                    help=" ")
 
 parser.add_argument('--save_model', dest='save_model', action='store_true', default=True,
                     help='evaluate model on validation set')

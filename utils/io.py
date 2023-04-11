@@ -5,39 +5,6 @@ from datetime import datetime
 import torch
 
 
-# ---------------load checkpoint--------------------
-# def load_checkpoint(model, pth_file):
-#     print('==> Reading from model checkpoint..')
-#     assert os.path.isfile(pth_file), 'Error: no model checkpoint directory found!'
-#     checkpoint = torch.load(pth_file)
-#
-#     pretrained_dict = checkpoint['state_dict']
-#     model_dict = model.module.state_dict()
-#     model_dict.update(pretrained_dict)
-#
-#     model.module.load_state_dict(model_dict)
-#     print("=> loaded model checkpoint '{}' (epoch {})"
-#           .format(pth_file, checkpoint['epoch']))
-#
-#     return checkpoint
-
-
-# ---------------save checkpoint--------------------
-# def save_checkpoint(state, is_best=False, outdir='checkpoint', filename='checkpoint.pth',iteral=50):
-#
-#     epochnum = state['epoch']
-#     filepath = os.path.join(outdir, filename)
-#     epochpath =  str(epochnum)+'_'+filename
-#     epochpath = os.path.join(outdir, epochpath)
-#     if epochnum % iteral == 0:
-#         savepath = epochpath
-#     else:
-#         savepath = filepath
-#     torch.save(state, savepath)
-#     if is_best:
-#         shutil.copyfile(savepath, os.path.join(outdir, 'model_best.pth.tar'))
-
-
 def save_checkpoint(dir, epoch, name="checkpoint", is_best=False, **kwargs):
     state = {"epoch": epoch}
     state.update(kwargs)

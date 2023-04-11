@@ -166,12 +166,11 @@ class ImageLoader(data.Dataset):
 
 
 def get_dataset(conf):
-    datadir = '/AMMI_DATA_01/dataset/fgvc-aircraft-2013b'
     conf['num_class'] = 100
 
     transform_train, transform_test = get_aircraft_transform(conf)
 
-    ds_train = ImageLoader(datadir, train=True, transform=transform_train, conf=conf)
-    ds_test = ImageLoader(datadir, train=False, transform=transform_test)
+    ds_train = ImageLoader(conf.aircraft_datadir, train=True, transform=transform_train, conf=conf)
+    ds_test = ImageLoader(onf.aircraft_datadir, train=False, transform=transform_test)
 
     return ds_train, ds_test

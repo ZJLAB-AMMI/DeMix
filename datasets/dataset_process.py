@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.append('/home/WLP/pythonProject/uncertainty/SnapMix')
+sys.path.append('DeMix')
 
 import torch
 import numpy as np
@@ -16,7 +16,7 @@ from datasets.aircraft import ImageLoader as AircraftImageLoader
 import pandas as pd
 
 
-def compute_detr_res(dataset_name='cub', im_size=800):
+def compute_detr_res(dataset_name='cub', datadir=None, im_size=800):
     def detr_detect(detr_model, img, topk=10):
         img = img.unsqueeze(0)
         outputs = detr_model(img.cuda())
@@ -31,13 +31,10 @@ def compute_detr_res(dataset_name='cub', im_size=800):
         return res
 
     if dataset_name in {'cub'}:
-        datadir = '/AMMI_DATA_01/dataset/cub-200-2011/CUB_200_2011'
         dataset = CubImageLoader(datadir, train=True, transform=transforms.Compose([transforms.ToTensor()]))
     elif dataset_name in {'car'}:
-        datadir = '/AMMI_DATA_01/dataset/stanford_cars'
         dataset = CarImageLoader(datadir, train=True, transform=transforms.Compose([transforms.ToTensor()]))
     elif dataset_name in {'aircraft'}:
-        datadir = '/AMMI_DATA_01/dataset/fgvc-aircraft-2013b'
         dataset = AircraftImageLoader(datadir, train=True, transform=transforms.Compose([transforms.ToTensor()]))
 
     image_normalizer = transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
@@ -68,7 +65,7 @@ def compute_detr_res(dataset_name='cub', im_size=800):
     file.close()
 
 
-def compute_salient_res(dataset_name='cub', im_size=800):
+def compute_salient_res(dataset_name='cub', datadir=None, im_size=800):
     import cv2
 
     def img_process(idx):
@@ -83,13 +80,10 @@ def compute_salient_res(dataset_name='cub', im_size=800):
         return img
 
     if dataset_name in {'cub'}:
-        datadir = '/AMMI_DATA_01/dataset/cub-200-2011/CUB_200_2011'
         dataset = CubImageLoader(datadir, train=True, transform=transforms.Compose([transforms.ToTensor()]))
     elif dataset_name in {'car'}:
-        datadir = '/AMMI_DATA_01/dataset/stanford_cars'
         dataset = CarImageLoader(datadir, train=True, transform=transforms.Compose([transforms.ToTensor()]))
     elif dataset_name in {'aircraft'}:
-        datadir = '/AMMI_DATA_01/dataset/fgvc-aircraft-2013b'
         dataset = AircraftImageLoader(datadir, train=True, transform=transforms.Compose([transforms.ToTensor()]))
 
     saliency = cv2.saliency.StaticSaliencyFineGrained_create()
@@ -108,8 +102,3 @@ def compute_salient_res(dataset_name='cub', im_size=800):
     pickle.dump(pd.DataFrame({'path': path_list, 'saliency_res': res_list}), file)
     file.close()
 
-# os.environ['CUDA_VISIBLE_DEVICES'] = "6"
-# dataset_name_set = ['cub', 'car', 'aircraft']
-# for dataset_name in dataset_name_set:
-#     compute_detr_res(dataset_name=dataset_name)
-#     compute_salient_res(dataset_name=dataset_name, im_size=224)

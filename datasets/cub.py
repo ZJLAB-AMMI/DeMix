@@ -114,12 +114,11 @@ class ImageLoader(Dataset):
 
 
 def get_dataset(conf):
-    datadir = '/AMMI_DATA_01/dataset/cub-200-2011/CUB_200_2011'
     conf['num_class'] = 200
 
     transform_train, transform_test = get_cub_transform(conf)
 
-    ds_train = ImageLoader(datadir, train=True, transform=transform_train, conf=conf)
-    ds_test = ImageLoader(datadir, train=False, transform=transform_test)
+    ds_train = ImageLoader(conf.cub_datadir, train=True, transform=transform_train, conf=conf)
+    ds_test = ImageLoader(conf.cub_datadir, train=False, transform=transform_test)
 
     return ds_train, ds_test
