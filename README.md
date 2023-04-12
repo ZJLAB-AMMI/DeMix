@@ -1,4 +1,4 @@
-# Detection Transformer can be Used as a Data Augmenter
+# Use the Detection Transformer as a Data Augmenter
 
 PyTorch implementation of DeMix | [paper](https://arxiv.org/pdf/2304.04554.pdf)
 
@@ -42,6 +42,21 @@ python demix.py
     --mixmethod='detrmix' # ['detrmix', 'saliencymix', 'mixup', 'cutmix']
     --pretrained=1 # if training from scratch, set pretrained=0
 ```
+
+## Citation
+If you find this code useful, please kindly cite  
+
+@article{wang2023use,
+
+  title={Use the Detection Transformer as a Data Augmenter},
+  
+  author={Wang, Luping and Liu, Bin},
+  
+  journal={arXiv preprint arXiv:2304.04554},
+  
+  year={2023}
+  
+}
 
 ## Acknowledgment
 
