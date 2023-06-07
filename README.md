@@ -1,6 +1,6 @@
 # Use the Detection Transformer as a Data Augmenter
 
-PyTorch implementation of DeMix | [paper](https://arxiv.org/pdf/2304.04554.pdf)
+PyTorch implementation of DeMix | [paper link](https://arxiv.org/pdf/2304.04554.pdf)
 
 ## Method Overview
 
@@ -45,19 +45,14 @@ python demix.py
 
 ## Citation
 If you find this code useful, please kindly cite  
-
+```bibtex
 @article{wang2023use,
-
   title={Use the Detection Transformer as a Data Augmenter},
-  
   author={Wang, Luping and Liu, Bin},
-  
   journal={arXiv preprint arXiv:2304.04554},
-  
-  year={2023}
-  
+  year={2023} 
 }
-
+```
 ## Acknowledgment
 
 This code is based on the [SnapMix](https://github.com/Shaoli-Huang/SnapMix.git).
